@@ -18,6 +18,10 @@ class Attribute
   def to_s
     @repr
   end
+
+  def unquoted_value
+    @value.sub(/"(.*?)" | '(.*?)' | (.*?)/x) { $+ }
+  end
 end
 
 class Tag
@@ -30,7 +34,21 @@ class Tag
   attr_reader :tag, :attributes
 
   def to_s
-    @repr
+    th_text_attribs = @attributes.flat_map {|v| v}.select {|a|
+      Attribute === a && a.name == 'th:text'
+    }
+
+    if th_text_attribs.size > 1
+      # th:text が複数あるタグは元のHTMLのエラーとみなす
+      raise RuntimeError.new("Syntax Error: #@repr")
+    end
+
+    if th_text_attribs.empty?
+      @repr
+    else
+      # タグの最後にth_text_attribs[0].unquoted_value を挿入する
+      @repr.sub(/>/, " " + th_text_attribs[0].unquoted_value + ">")
+    end
   end
 end
 

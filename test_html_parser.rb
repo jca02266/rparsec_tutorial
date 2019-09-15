@@ -53,6 +53,14 @@ class HtmlParserTest < Minitest::Test
     assert_equal(str, @parser.attribute.parse_to_eof(str).to_s)
   end
 
+  def test_attribute_thtext
+    str = 'th:text="${obj.property}"'
+    attribute = @parser.attribute.parse(str)
+    assert_equal('th:text', attribute.name)
+    assert_equal('"${obj.property}"', attribute.value)
+    assert_equal('${obj.property}', attribute.unquoted_value)
+  end
+
   def test_html
     html = <<END
 <!--
@@ -64,9 +72,17 @@ class HtmlParserTest < Minitest::Test
 </head>
 
 <body>
+  <div foo="bar">
+  </div>
+  <div th:text="${obj.property}">
+  </div>
 </body>
 END
+    expected = html.sub('<div th:text="${obj.property}">',
+                        '<div th:text="${obj.property}" ${obj.property}>',
+                       )
+
     ret = @parser.html.parse_to_eof(html.force_encoding('ASCII-8BIT'))
-    assert_equal html, HtmlParser.walk(ret)
+    assert_equal expected.force_encoding('ASCII-8BIT'), HtmlParser.walk(ret)
   end
 end
