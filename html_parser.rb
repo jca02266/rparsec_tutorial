@@ -20,6 +20,20 @@ class Attribute
   end
 end
 
+class Tag
+  def initialize(repr, tag, attributes)
+    @repr = repr
+    @tag = tag
+    @attributes = attributes
+  end
+
+  attr_reader :tag, :attributes
+
+  def to_s
+    @repr
+  end
+end
+
 class HtmlParser
   def seq(*args)
     sequence(*args) {|*e|
@@ -64,14 +78,18 @@ class HtmlParser
   #       | "<" ident (attribute)* "/>"
   #       | "</" ident ">"
   def tag
-    seq(string("<"), space.many,
+    tag_proc = Proc.new {|*e|
+      Tag.new(e.join, e[2], e[4])
+    }
+
+    sequence(string("<"), space.many,
          ident, space.many,
          seq(attribute, space.many).many,
-         string(">")) |
-    seq(string("<"), space.many,
+         string(">"), &tag_proc) |
+    sequence(string("<"), space.many,
          ident, space.many,
          seq(attribute, space.many).many,
-         string("/>")) |
+         string("/>"), &tag_proc) |
     seq(string("</"), space.many,
          ident, space.many,
          string(">"))
