@@ -30,8 +30,8 @@ class HtmlParserTest < Minitest::Test
   end
 
   def test_html
-    html = "<DOCTYPE html><head></head><body></body>"
+    html = "<!DOCTYPE html><head></head><body></body>"
     assert_equal html,
-                 @parser.html.parse_to_eof(html)
+                 @parser.html.parse_to_eof(html).join
   end
 end
