@@ -7,7 +7,6 @@ require 'rparsec.rb'
 include RParsec::Parsers
 
 ident = regexp(/[A-Za-z][A-Za-z0-9_:.]*/)
+dollar_expression = sequence(string("${"), ident, string("}"))
 
-p ident.parse("abc")
-p ident.parse("obj.property")
-p ident.parse("${obj.property}")
+p dollar_expression.parse("${obj.property}")
