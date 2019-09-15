@@ -6,6 +6,20 @@ require 'rparsec.rb'
 
 include RParsec::Parsers
 
+class Attribute
+  def initialize(repr, name, value)
+    @repr = repr
+    @name = name
+    @value = value
+  end
+
+  attr_reader :name, :value
+
+  def to_s
+    @repr
+  end
+end
+
 class HtmlParser
   def seq(*args)
     sequence(*args) {|*e|
@@ -37,10 +51,13 @@ class HtmlParser
   #            | ident "=" unquoted_value
   #            | ident
   def attribute
-    seq(ident, space.many,
+    sequence(ident, space.many,
          string("="), space.many,
          (quoted_string | unquoted_value)
-        ) | ident
+        ) {|*e|
+      Attribute.new(e.join, e[0], e[4])
+    } |
+    ident
   end
 
   # tag :: "<" ident (attribute)* ">"
@@ -78,12 +95,24 @@ class HtmlParser
          (tag | text | space).many,
         ) << eof
   end
+
+  def self.walk(parsed_object)
+    case parsed_object
+    when Array
+      parsed_object.map {|s|
+        self.walk(s)
+      }.join
+    else
+      parsed_object.to_s
+    end
+  end
 end
 
 if $0 == __FILE__
   ARGV.each {|file|
     buf = File.binread(file)
-    buf = HtmlParser.new.html.parse(buf).join
+    ret = HtmlParser.new.html.parse(buf)
+    buf = HtmlParser.walk(ret)
     File.rename(file, file + ".bak")
     File.open(file, "wb") {|o| o.print buf}
   }

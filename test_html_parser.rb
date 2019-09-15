@@ -42,15 +42,15 @@ class HtmlParserTest < Minitest::Test
 
   def test_attribute
     str = 'foo="bar"'
-    assert_equal(str, @parser.attribute.parse_to_eof(str).join)
+    assert_equal(str, @parser.attribute.parse_to_eof(str).to_s)
     str = "foo='bar'"
-    assert_equal(str, @parser.attribute.parse_to_eof(str).join)
+    assert_equal(str, @parser.attribute.parse_to_eof(str).to_s)
     str = "foo = 'bar'"
-    assert_equal(str, @parser.attribute.parse_to_eof(str).join)
+    assert_equal(str, @parser.attribute.parse_to_eof(str).to_s)
     str = "foo"
     assert_equal(str, @parser.attribute.parse_to_eof(str))
     str = "foo=bar"
-    assert_equal(str, @parser.attribute.parse_to_eof(str).join)
+    assert_equal(str, @parser.attribute.parse_to_eof(str).to_s)
   end
 
   def test_html
@@ -66,7 +66,7 @@ class HtmlParserTest < Minitest::Test
 <body>
 </body>
 END
-    assert_equal html,
-                 @parser.html.parse_to_eof(html.force_encoding('ASCII-8BIT')).join
+    ret = @parser.html.parse_to_eof(html.force_encoding('ASCII-8BIT'))
+    assert_equal html, HtmlParser.walk(ret)
   end
 end
