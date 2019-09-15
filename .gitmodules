@@ -1,0 +1,3 @@
+[submodule "rparsec"]
+	path = rparsec
+	url = https://github.com/jca02266/rparsec.git
