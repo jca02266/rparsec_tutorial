@@ -29,9 +29,18 @@ class HtmlParser
     any
   end
 
+  def space
+    regexp(/[ \t\f\r\n]+/) | comment_block
+  end
+
+  def comment_block
+    seq(string("<!--"), not_string("-->").many, string("-->"))
+  end
+
   def html
-    seq(string("<!DOCTYPE html>"),
-        (tag | text).many,
+    seq(space.many,
+         string("<!DOCTYPE html>"),
+         (tag | text | space).many,
         ) << eof
   end
 end

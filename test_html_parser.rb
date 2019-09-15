@@ -30,8 +30,19 @@ class HtmlParserTest < Minitest::Test
   end
 
   def test_html
-    html = "<!DOCTYPE html><head></head><body></body>"
+    html = <<END
+<!--
+テスト
+-->
+<!DOCTYPE html>
+
+<head>
+</head>
+
+<body>
+</body>
+END
     assert_equal html,
-                 @parser.html.parse_to_eof(html).join
+                 @parser.html.parse_to_eof(html.force_encoding('ASCII-8BIT')).join
   end
 end
