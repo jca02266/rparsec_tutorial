@@ -29,6 +29,30 @@ class HtmlParserTest < Minitest::Test
                  @parser.dollar_expression.parse_to_eof("${obj.property}").join
   end
 
+  def test_quoted_string
+    str = '"abc"'
+    assert_equal(str, @parser.quoted_string.parse_to_eof(str))
+    str = "'abc'"
+    assert_equal(str, @parser.quoted_string.parse_to_eof(str))
+    str = %q('a"bc')
+    assert_equal(str, @parser.quoted_string.parse_to_eof(str))
+    str = %q("a'bc")
+    assert_equal(str, @parser.quoted_string.parse_to_eof(str))
+  end
+
+  def test_attribute
+    str = 'foo="bar"'
+    assert_equal(str, @parser.attribute.parse_to_eof(str).join)
+    str = "foo='bar'"
+    assert_equal(str, @parser.attribute.parse_to_eof(str).join)
+    str = "foo = 'bar'"
+    assert_equal(str, @parser.attribute.parse_to_eof(str).join)
+    str = "foo"
+    assert_equal(str, @parser.attribute.parse_to_eof(str))
+    str = "foo=bar"
+    assert_equal(str, @parser.attribute.parse_to_eof(str).join)
+  end
+
   def test_html
     html = <<END
 <!--

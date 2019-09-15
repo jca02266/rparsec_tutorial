@@ -21,8 +21,43 @@ class HtmlParser
     seq(string("${"), ident, string("}"))
   end
 
+  # quoted_string :: "'" any* "'"
+  #                | '"' any* '"'
+  def quoted_string
+    regexp(/' .*? '/x) |
+    regexp(/" .*? "/x)
+  end
+
+  # unquoted_value :: [^"' \t\f\r\n=<>`/]+
+  def unquoted_value
+    regexp(%r{[^"' \t\f\r\n=<>`/]+})
+  end
+
+  # attribute :: ident "=" quoted_value
+  #            | ident "=" unquoted_value
+  #            | ident
+  def attribute
+    seq(ident, space.many,
+         string("="), space.many,
+         (quoted_string | unquoted_value)
+        ) | ident
+  end
+
+  # tag :: "<" ident (attribute)* ">"
+  #       | "<" ident (attribute)* "/>"
+  #       | "</" ident ">"
   def tag
-    any
+    seq(string("<"), space.many,
+         ident, space.many,
+         seq(attribute, space.many).many,
+         string(">")) |
+    seq(string("<"), space.many,
+         ident, space.many,
+         seq(attribute, space.many).many,
+         string("/>")) |
+    seq(string("</"), space.many,
+         ident, space.many,
+         string(">"))
   end
 
   def text
