@@ -15,4 +15,4 @@ end
 ident = regexp(/[A-Za-z][A-Za-z0-9_:.]*/)
 dollar_expression = seq(string("${"), ident, string("}"))
 
-p dollar_expression.parse("${obj.property}")
+p (dollar_expression << eof).parse("${obj.property}")
