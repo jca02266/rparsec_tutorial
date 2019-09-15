@@ -23,8 +23,15 @@ class HtmlParserTest < Minitest::Test
     end
     assert_equal "/(?-mix:[A-Za-z][A-Za-z0-9_:.]*)/ expected, $ at line 1, col 1.", e.message
   end
+
   def test_dollar_expression
     assert_equal "${obj.property}",
                  @parser.dollar_expression.parse_to_eof("${obj.property}").join
+  end
+
+  def test_html
+    html = "<DOCTYPE html><head></head><body></body>"
+    assert_equal html,
+                 @parser.html.parse_to_eof(html)
   end
 end

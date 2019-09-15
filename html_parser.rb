@@ -20,4 +20,18 @@ class HtmlParser
   def dollar_expression
     seq(string("${"), ident, string("}"))
   end
+
+  def tag
+    any
+  end
+
+  def text
+    any
+  end
+
+  def html
+    seq(string("<!DOCTYPE html>"),
+        (tag | text).many,
+        ) << eof
+  end
 end
