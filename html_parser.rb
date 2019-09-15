@@ -6,13 +6,18 @@ require 'rparsec.rb'
 
 include RParsec::Parsers
 
-def seq(*args)
-  sequence(*args) {|*e|
-    e
-  }
+class HtmlParser
+  def seq(*args)
+    sequence(*args) {|*e|
+      e
+    }
+  end
+
+  def ident
+    regexp(/[A-Za-z][A-Za-z0-9_:.]*/)
+  end
+
+  def dollar_expression
+    seq(string("${"), ident, string("}"))
+  end
 end
-
-ident = regexp(/[A-Za-z][A-Za-z0-9_:.]*/)
-dollar_expression = seq(string("${"), ident, string("}"))
-
-p (dollar_expression << eof).parse("${obj.property}")
