@@ -79,3 +79,12 @@ class HtmlParser
         ) << eof
   end
 end
+
+if $0 == __FILE__
+  ARGV.each {|file|
+    buf = File.binread(file)
+    buf = HtmlParser.new.html.parse(buf).join
+    File.rename(file, file + ".bak")
+    File.open(file, "wb") {|o| o.print buf}
+  }
+end
