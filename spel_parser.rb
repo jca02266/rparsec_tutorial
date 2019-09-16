@@ -6,6 +6,28 @@ require 'rparsec.rb'
 
 include RParsec::Parsers
 
+class Function
+  def initialize(repr, name, params)
+    @repr = repr
+    @name = name
+    @params = params
+  end
+
+  def to_s
+    @repr
+  end
+end
+
+class Ident
+  def initialize(repr)
+    @repr = @ident = repr
+  end
+
+  def to_s
+    @repr
+  end
+end
+
 class SpelParser
   def seq(*args)
     sequence(*args) {|*e|
@@ -43,11 +65,16 @@ class SpelParser
   end
 
   def function
-    seq(string("#"), ident, string("("), params.optional, string(")"))
+    sequence(string("#"), ident, string("("), params.optional, string(")")) {|*e|
+      Function.new(e.join, e[1], e[3]) 
+    }
   end
 
   def term
-    lazy { ident | literal | function }
+    lazy { ident.map {|e| Ident.new(e)} |
+           literal |
+           function
+         }
   end
 
   def expression

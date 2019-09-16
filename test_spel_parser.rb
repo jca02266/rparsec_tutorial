@@ -44,23 +44,23 @@ class SpelParserTest < Minitest::Test
   end
 
   def test_function
-    assert_equal '#xxx.function1()', @parser.function.parse_to_eof('#xxx.function1()').join
-    assert_equal '#xxx.function1(012)', @parser.function.parse_to_eof('#xxx.function1(012)').join
-    assert_equal '#xxx.function1(012, "abc")', @parser.function.parse_to_eof('#xxx.function1(012, "abc")').join
-    assert_equal '#xxx.function1(012, "abc", #func())', @parser.function.parse_to_eof('#xxx.function1(012, "abc", #func())').join
+    assert_equal '#xxx.function1()', @parser.function.parse_to_eof('#xxx.function1()').to_s
+    assert_equal '#xxx.function1(012)', @parser.function.parse_to_eof('#xxx.function1(012)').to_s
+    assert_equal '#xxx.function1(012, "abc")', @parser.function.parse_to_eof('#xxx.function1(012, "abc")').to_s
+    assert_equal '#xxx.function1(012, "abc", #func())', @parser.function.parse_to_eof('#xxx.function1(012, "abc", #func())').to_s
   end
 
   def test_term
-    assert_equal 'abc.def', @parser.term.parse_to_eof('abc.def')
-    assert_equal '012', @parser.term.parse_to_eof('012')
-    assert_equal '"abc"', @parser.term.parse_to_eof('"abc"')
-    assert_equal '#xxx.function(012, "abc")', @parser.term.parse_to_eof('#xxx.function(012, "abc")').join
+    assert_equal 'abc.def', @parser.term.parse_to_eof('abc.def').to_s
+    assert_equal '012', @parser.term.parse_to_eof('012').to_s
+    assert_equal '"abc"', @parser.term.parse_to_eof('"abc"').to_s
+    assert_equal '#xxx.function(012, "abc")', @parser.term.parse_to_eof('#xxx.function(012, "abc")').to_s
   end
 
   def test_expression
-    assert_equal 'abc.def', @parser.expression.parse_to_eof('abc.def')
+    assert_equal 'abc.def', @parser.expression.parse_to_eof('abc.def').to_s
     assert_equal 'abc.def + 012', @parser.expression.parse_to_eof('abc.def + 012').join
-    assert_equal '#function(abc.def + 012)', @parser.expression.parse_to_eof('#function(abc.def + 012)').join
+    assert_equal '#function(abc.def + 012)', @parser.expression.parse_to_eof('#function(abc.def + 012)').to_s
   end
 
   def test_dollar_expression
