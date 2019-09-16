@@ -3,6 +3,7 @@
 
 $LOAD_PATH << './rparsec'
 require 'rparsec.rb'
+require_relative 'spel_parser.rb'
 
 include RParsec::Parsers
 
@@ -46,8 +47,18 @@ class Tag
     if th_text_attribs.empty?
       @repr
     else
-      # タグの最後にth_text_attribs[0].unquoted_value を挿入する
-      @repr.sub(/>/, " " + th_text_attribs[0].unquoted_value + ">")
+      # th_text_attribs[0].unquoted_value をパースしてpropertyを抽出する
+      ret = SpelParser.new.parse(th_text_attribs[0].unquoted_value)
+      properties = []
+      SpelParser.walk(ret, properties)
+      case properties.size
+      when 1
+        @repr.sub(/>/, " data-prop='#{properties[0]}'>")
+      when 0
+        @repr
+      else
+        raise RuntimeError.new("Too many properties: #{properties.inspect}")
+      end
     end
   end
 end

@@ -13,6 +13,15 @@ class Function
     @params = params
   end
 
+  def property
+    case @name
+    when 'xxx.function1' then @params.property
+    when 'xxx.function2' then @params[4].property
+    else
+      raise RuntimeError.new("unknown function #{@name}")
+    end
+  end
+
   def to_s
     @repr
   end
@@ -21,6 +30,12 @@ end
 class Ident
   def initialize(repr)
     @repr = @ident = repr
+  end
+
+  def property
+    if /\.([^.]+)\z/ =~ @ident
+      $1
+    end
   end
 
   def to_s
@@ -88,5 +103,19 @@ class SpelParser
 
   def parse(s)
     (dollar_expression << eof).parse(s)
+  end
+
+  def self.walk(parsed_object, property)
+    case parsed_object
+    when Array
+      parsed_object.map {|s|
+        self.walk(s, property)
+      }.join
+    when Ident, Function
+      property.push parsed_object.property
+      parsed_object.to_s
+    else
+      parsed_object.to_s
+    end
   end
 end

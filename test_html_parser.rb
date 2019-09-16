@@ -79,7 +79,7 @@ class HtmlParserTest < Minitest::Test
 </body>
 END
     expected = html.sub('<div th:text="${obj.property}">',
-                        '<div th:text="${obj.property}" ${obj.property}>',
+                        '<div th:text="${obj.property}" data-prop=\'property\'>',
                        )
 
     ret = @parser.html.parse_to_eof(html.force_encoding('ASCII-8BIT'))

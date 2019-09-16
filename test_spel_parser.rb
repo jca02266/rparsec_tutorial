@@ -66,4 +66,20 @@ class SpelParserTest < Minitest::Test
   def test_dollar_expression
     assert_equal '${#function(abc.def + 012) + "012"}', @parser.dollar_expression.parse_to_eof('${#function(abc.def + 012) + "012"}').join
   end
+
+  def assert_walk(expect, spel_expr)
+    ret = @parser.parse(spel_expr)
+    properties = []
+    SpelParser.walk(ret, properties)
+    assert_equal(expect, properties)
+  end
+
+  def test_walk
+    assert_walk [nil], '${foo}'
+    assert_walk ['bar'], '${foo.bar}'
+    assert_walk ['bar'], '${foo.bar + "abc"}'
+    assert_walk ['bar'], '${#xxx.function1(foo.bar)}'
+    assert_walk ['baz'], '${#xxx.function2("foo", bar.baz)}'
+    assert_walk ['bar', 'qux'], '${foo.bar + baz.qux}'
+  end
 end
