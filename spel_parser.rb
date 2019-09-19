@@ -7,7 +7,7 @@ require 'rparsec.rb'
 include RParsec::Parsers
 
 class Function
-  def initialize(repr, name, params)
+  def initialize(repr, name, *params)
     @repr = repr
     @name = name
     @params = params
@@ -15,8 +15,8 @@ class Function
 
   def property
     case @name
-    when 'xxx.function1' then @params.property
-    when 'xxx.function2' then @params[4].property
+    when 'xxx.function1' then @params[0].property
+    when 'xxx.function2' then @params[1].property
     else
       raise RuntimeError.new("unknown function #{@name}")
     end
@@ -24,6 +24,21 @@ class Function
 
   def to_s
     @repr
+  end
+end
+
+class Params
+  def initialize(repr, *params)
+    @repr = repr
+    @params = params
+  end
+
+  def to_s
+    @repr
+  end
+
+  def params
+    @params
   end
 end
 
@@ -75,13 +90,19 @@ class SpelParser
   end
 
   def params
-    lazy { seq(expression, space.many, string(","), space.many, params) } |
-    expression
+    lazy {
+      seq(expression, space.many, string(","), space.many, params)
+    }.map {|e|
+      exp, _, _, _, para = e
+      Params.new(e.join, exp, *para.params)
+    } |
+    expression.map {|v| Params.new([*v].join, v) }
   end
 
   def function
-    sequence(string("#"), ident, string("("), params.optional, string(")")) {|*e|
-      Function.new(e.join, e[1], e[3]) 
+    sequence(string("#"), ident, string("("), params.optional(Params.new('')), string(")")) {|*e|
+      _, id, _, para, _ = e
+      Function.new(e.join, id, *para.params)
     }
   end
 

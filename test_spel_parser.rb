@@ -39,8 +39,10 @@ class SpelParserTest < Minitest::Test
   end
 
   def test_params
-    assert_equal '012', @parser.params.parse_to_eof('012')
-    assert_equal '012, "abc"', @parser.params.parse_to_eof('012, "abc"').join
+    assert_equal '012', @parser.params.parse_to_eof('012').to_s
+    assert_equal '012, "abc"', @parser.params.parse_to_eof('012, "abc"').to_s
+    assert_equal '12 + 34', @parser.params.parse_to_eof('12 + 34').to_s
+    assert_equal '12 + 34, 34 + 56', @parser.params.parse_to_eof('12 + 34, 34 + 56').to_s
   end
 
   def test_function
