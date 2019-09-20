@@ -138,7 +138,7 @@ class HtmlParser
 
   def html
     seq(space.many,
-         string("<!DOCTYPE html>"),
+         string_nocase("<!DOCTYPE html>"),
          (tag | text | space).many,
         ) << eof
   end

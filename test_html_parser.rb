@@ -66,7 +66,7 @@ class HtmlParserTest < Minitest::Test
 <!--
 テスト
 -->
-<!DOCTYPE html>
+<!DOCTYPE HTML>
 
 <head>
 </head>
